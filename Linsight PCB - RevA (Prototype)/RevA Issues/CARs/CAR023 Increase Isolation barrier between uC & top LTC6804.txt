@@ -1,0 +1,1 @@
+Somehow, the isolation barrier on the LTC6804 directly to the left of the main uC only has a 2.5 mm gap.  Gap should be at least 3 mm.  WTF?

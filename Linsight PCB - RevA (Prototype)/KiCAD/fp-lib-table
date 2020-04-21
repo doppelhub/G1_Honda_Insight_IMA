@@ -1,0 +1,4 @@
+(fp_lib_table
+  (lib (name LinsightFootprints)(type KiCad)(uri "$(KIPRJMOD)\\LinsightFootprints.pretty")(options "")(descr ""))
+  (lib (name Phoenix_JTS)(type Legacy)(uri "C:\\Users\\John\\Desktop\\DD MASTER\\GhostGunner\\GrbIO V1\\GrBLDC Master\\KiCAD-JTS\\LibMod-JTS\\Phoenix_JTS.mod")(options "")(descr ""))
+)

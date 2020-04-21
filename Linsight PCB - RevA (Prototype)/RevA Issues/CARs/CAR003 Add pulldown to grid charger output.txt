@@ -1,0 +1,3 @@
+LED driver (grid charger) 10Vnom, 15Babsmax.  Need to add pulldown resistor if LED driver doesn't have input zener overvoltage protection.  Add the pulldown option regardless.  Should limit maximum voltage to 12V, per data sheet.  Note the supply is also looking for a true DC voltage, so we need to add a lowpass RC, too.  So add one cap and one resistor, both to ground.
+
+Consider changing grid charge output from PWM to DAC.  CC LED drivers want DC voltage, so fewer output component issues as long as DAC will output 10V (it might not).  UPDATE: UC3C DAC only outputs up to VREF (3.3V), so must keep using open drain PWM with lowpass and voltage divider (pulled to 12V).

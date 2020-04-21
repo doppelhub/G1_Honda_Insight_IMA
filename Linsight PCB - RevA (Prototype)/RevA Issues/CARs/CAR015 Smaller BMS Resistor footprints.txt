@@ -1,0 +1,1 @@
+Change 22 Ohm BMS 2512 resistor to a smaller pad size to reduce chip cracking.  Add two or three 44/66 Ohm smaller resistors, if they'll fit, or just drop down to a single (lower power) 1206. Thomas uses LTR18EZPJ470, which is an 0612.

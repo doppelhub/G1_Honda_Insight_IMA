@@ -1,0 +1,5 @@
+Need additional components on isoSPI bus in automotive environment:
+-Increase C24 (and other two) to 100 pF.
+-Add two 59 Ohm resistors in series between IPA and IMA on each LTC6804 & LTC6820.
+-Add a 10 nF cap between the two 59 Ohm resistors and ground.
+

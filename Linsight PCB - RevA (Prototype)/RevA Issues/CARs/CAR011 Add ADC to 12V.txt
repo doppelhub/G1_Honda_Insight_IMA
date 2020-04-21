@@ -1,0 +1,5 @@
+Need to be able to measure the 12V rail when the car is off; can't use H-Line because the ECM is off.
+Be sure to add this new pin to the excel pinout sheet, and to board.h definition file.
+Can likely use 5V_senseDIV2 if uC can internally measure its 5V input voltage.
+
+Note that the 12 volt always hot line (VBU) has 550 mOhm ESR, so if possible sense the 12 volt rail elsewhere.  I think we can sense across one of the high side drivers (as long as said external relay is off).  For example, we could read the voltage through PDUFAN signal, as long as the fan is off.  

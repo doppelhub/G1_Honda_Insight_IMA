@@ -1,0 +1,2 @@
+U13 (ISP762T) is unnecessary.  DCDC pulls at most 22 mA from BLK/YEL (12V input).
+ISP762T is $0.89, so we could use a fet instead (we already have some on the PCB).

@@ -1,0 +1,18 @@
+MAMODE1 (why three instances? (probably wrong)= PWM
+
+Mode:
+-PRESTART= CmdPwr ?       MaMode1 15%*  MaMode2 ?
+-Standby = CmdPwr 50:30%  MaMode1 50%   MaMode2 High
+-Assist  = CmdPwr 51:90%  Mamode1 25%   MaMode2 Low
+-Regen   = CmdPwr 49:10%  MaMode1 35%   MaMode2 High
+-Start   = CmdPwr 50%     MaMode1 85%   MaMode2 Low
+(Unverified) clarification:
+-Standby (idle charge) = CmdPwr 50:30%  MaMode1 45%   MaMode2 High
+-Standby (stop charge) = CmdPwr 50%     MaMode1 55%   MaMode2 High
+-Standby (smooth idle) = CmdPwr ?	MaMode1 60%   MaMode2 ?
+-AutoStop	       = CmdPwr ?	MaMode1 70    MaMode2 ?
+
+*15% on MAMODE1 shuts DC-DC off. Any other duty enables it.
+Pulling MAMODE2 low turns DC-DC turns on regardless of duty on MAMODE1.
+
+Inside MCM, opamp integrates PSM, then adc converts to an 8-bit 0-5V.  Conclusion: PWM frequency doesn't matter.

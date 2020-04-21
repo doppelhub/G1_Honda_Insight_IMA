@@ -1,0 +1,22 @@
+4 pin connector P8's label text doesn't match specified net name:
+
+As-is (incorrect):
+Pin -- Connector Label -- Schematic net names
+1 -- DCDC(BLK/YEL) -- DCDC12Von_start<-DcDCVon-start
+2 -- DCDC(WHT/GRN) -- GRID_CHARGER_En<-GRID_CHARGER_PWM
+3 -- GRID(PPL) -- DCDC_VOUT_SET<-DCDC_VOUT_PWM
+4 -- GRID(GRY) -- GND_ENG
+
+Proposed (schematic pins 2&3 swapped):
+Pin -- Connector Label -- Schematic net names
+1 -- DCDC(BLK/YEL) -- DCDC12Von_start<-DcDCVon-start
+2 -- DCDC(WHT/GRN) -- DCDC_VOUT_SET<-DCDC_VOUT_PWM
+3 -- GRID(PPL) -- GRID_CHARGER_En<-GRID_CHARGER_PWM
+4 -- GRID(GRY) -- GND_ENG
+
+Workaround (for RevA):
+Ignore pin2&3 silkscreen text.  Use the following pinout:
+1 -- DCDC(BLK/YEL) = outputs 12V (static) when uC wants DCDC on
+2 -- GRID(PPL) = outputs 12V PWM when uC wants grid charger on
+3 -- DCDC(WHT/GRN) = outputs 12V PWM to control DCDC output voltage
+4 -- GRID(GRY) - grid charger ground reference

@@ -1,0 +1,15 @@
+VBU powers the following Linsight components:
+IGHLD Relay (120 mA)
+PRE Relay (490 mA)
+HVCNT Drive Relay (120 mA)
+Linsight Buck (460 mA)
+DCDC Drive Circuit (15 mA)
+Battery Fans (780 mA)
+
+Total worst case current draw is 1985 mA, which occurs when the fans are already on while the car is starting.  This is brief because the PRE relay is energized, which only occurs for a few seconds (until the capacitors in PDU are charged).  At this load, the VBU line falls to 11.79 volts (assuming 12V battery is at 12.86 volts).
+
+The worst case estimated continuous current draw is 1495 mA, which occurs when the fans are running and the car is in drive mode.  At this load, the VBU line falls to 12.05 V (assuming the battery is at 12.86 volts).
+
+The expected cruising continuous current draw is 1095 mA, which pulls the VBU line to 12.20 volts (assuming the battery is at 12.86 volts).
+
+Overall, VBU round trip ESR (via PG2) is 550 mOhm from battery positive to battery negative.

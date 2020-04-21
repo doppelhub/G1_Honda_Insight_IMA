@@ -1,0 +1,1 @@
+It's difficult to quickly solder the 100 pin MCM ABCD connector because the back side copper is so close to the pins.  Even though a solder mask is present, the solder still balls up and sits directly on top, which could lead to shorts.

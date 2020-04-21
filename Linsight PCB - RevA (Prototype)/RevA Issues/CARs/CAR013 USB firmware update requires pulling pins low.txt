@@ -1,0 +1,4 @@
+Based on this forum post:
+http://www.avrfreaks.net/forum/solved-at32uc3b1256-usb-programming?skey=UC3%20oscillator%20programming
+
+Need to pull a couple pins low to program.  Surprised this isn't in the data sheet.

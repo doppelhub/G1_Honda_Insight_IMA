@@ -1,0 +1,23 @@
+The motor is 3 Phase Permanent Magnet Brushless DC rated by Honda at 10kw.
+We have no idea if that is a 1 hour rating, I doubt it. Probably more like <5 minutes.
+You can overdrive it at 15kw for short periods < 30 seconds. +50%
+It will tolerate 3-5kw for longer periods. It looks like 7kW continuous for an hour is safe.
+
+Closed system (i.e. worst case) thermal mass calculations on page 58 of MIT paper.  In summary:
+-figure out how much thermal mass the IMA motor has to sink heat into... ~=30 kg (guess)
+-multiply thermal mass times energy absorption constant (~384 J/(kg-Kelvin) for copper & 460 J/(kg-Kelvin) for steel)
+(http://www.engineeringtoolbox.com/specific-heat-metals-d_152.html)
+-figure out maximum temperature tolerated by IMA motor (in degC).
+-figure out DC resistance in one phase (note in delta there's some simple math required)
+
+time_to_increase_temp_n_degC = thermal_mass * material_energy_absorption_constant * degC_allowed to increase / ( 3 * I_rms^2 * R_phase)
+
+For example, you can run the BLDC motor at 80 A for 104 seconds with the following assumptions:
+-20 kg thermal mass
+-400 J/(kg-Kelvin) material energy absorption constant
+-50 degC temperature rise
+-80 A rms
+-200 mOhm phase resistance
+
+For example, you can run the BLDC motor at 15 A for 49 minutes with zero external cooling, and only 50 degC temperature rise.
+Peter: "The Ima motor stator in stainless clamp mounting weighs 9kg"

@@ -1,0 +1,1 @@
+Add pullups to LTC6820 SCK and CS lines (and spare them out.

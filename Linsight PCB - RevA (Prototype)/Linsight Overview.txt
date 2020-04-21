@@ -1,0 +1,58 @@
+What is Linsight?
+Linsight is a plug-and-play lithium battery upgrade designed specifically for the G1 Honda Insight.  Goal: cheaper than NiMH
+
+Linsight replaces the following OEM components (everything in the box):
+-NiMH battery -> BYOLi (bring your own lithium)(36S onboard, )
+-MCM (motor control module) -> Linsight PCB
+-BCM (battery control module) -> (same) Linsight PCB
+(Picture: Left: OEM, Right: Linsight)
+
+(Show PCB, highlighting plug-and-play connectors & screw terminals)
+-No harness cuts*
+*DCDC control when key 'off' requires two simple cuts 
+
+Installing Linsight
+-Buy batteries.  Modify Leaf cells (if using Leaf cells).
+-Install batteries (might require converter/inverter removal)
+-If using more than 36S, purchase LTC demo boards (12S/board)
+-Remove OEM battery and computers
+-disassemble battery board (show picture with required components)
+-install 
+
+Linsight replicates the following aftermarket components:
+-manual IMA control systems (MIMA, etc)
+-current hack boards (technically can still use, but no need; complete SW control)
+-BCM battery spoof boards (nothing to reuse, BCM no longer present)
+-grid chargers (you can reuse certain grid chargers)
+-joysticks (Peter's joysticks that plug into OBDIIC&C compatible)
+
+Linsight is compatible with anything external to the OEM MCM/BCM
+-Internal MCM modifications not compatible
+
+Linsight Controls 101
+(pictures showing theoretical controls)
+(show mode 1)
+(show mode 2)
+(show mode 3)
+(discuss Lean Control)
+(discuss anti-stall feature)
+(ask for feedback)
+
+Timeline: Linsight is a pet project.  I work on it as time allows.  If there's enough interest to make financial sense, I can prioritize it above other consulting work.  Most of my potential buyers are probably in this room.  Certainly the early adopters are sitting right here.  
+
+Using more than 36S cells (can I make 48S fit?)
+
+Bonus Slide for non-Linsight cars with dead IMA: Spoof functional pack
+Slides on Proof of concept Arduino board
+
+Bonus Slide for non-Linsight cars: Enable DCDC while grid charging (with key on)
+Enable DCDC whenever key is on:
+cut WHT/GRN (ECU) - DCDC pin A9
+cut GRN/BLK (MCM) - DCDC pin 
+
+You could install a DPST relay to force DCDC on whenever key on (e.g. while charging)
+
+...
+
+DCDC outputs 14V@20A with input down to 62 V.  Between 58-62V the output is no longer in regulation (it falls proportional to input voltage).
+

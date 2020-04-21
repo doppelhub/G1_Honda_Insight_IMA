@@ -1,0 +1,7 @@
+Existing PMOS circuit doesn't pull 'low' state low enough due to incorrect design.  The as-is implementation doesn't work well because the gate voltage is always 0V when shorting the source to gnd (drain).  Thus, Vgs drops as the source drops to 0V, and the FET starts to turn off.  
+
+use NMOS (S=GND) instead of PMOS to transmit data on UARTs; note the output data will be opposite the actual tx-uC pin.Need to instead use NFET with source tied to ground, and thus we can reliably pull the pin low as needed.
+
+See Q44 & Q46
+
+Update: UC3C supports open drain, so it's entirely possible we can pullup internally (or not, there's an external pullup) and then just directly short the RX/TX lines together.  It does the same thing as having a FET in the first place, as long as the TX line rests in the high impedance (pulled up) state.

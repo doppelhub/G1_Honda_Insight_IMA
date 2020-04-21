@@ -1,0 +1,6 @@
+12V signals divided to 5V don't meet Vih(min) levels with 3.3k resistors.  Change all 3.3k resistors to 3.92k.  Atmel app note mentions all IO pins have overvoltage protection as long as the input current is limited; Linsight's 7.33k resistor limits current to 800uA@6V, which is in-spec.  
+
+For prototype board, only the following resistors need to change to 3.92k:
+R146
+R142
+R202

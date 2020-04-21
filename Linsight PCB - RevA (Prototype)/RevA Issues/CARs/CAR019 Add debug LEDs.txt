@@ -1,0 +1,1 @@
+Add debug LEDs to LTC6804 GPIO and MAINuC/BLACuC... tremendous troubleshooting advantage, particularly to customers.

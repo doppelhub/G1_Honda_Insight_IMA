@@ -1,0 +1,1 @@
+Rename schematic nets to match Linsight's #define names.  These names are much easier to understand than Honda's OEM names.

@@ -1,0 +1,1 @@
+C116 (10 nF) is too large to use debugwire at 8 MHz.  If BLACuC requires debugwire to program fuses, then need to remove it on next build.

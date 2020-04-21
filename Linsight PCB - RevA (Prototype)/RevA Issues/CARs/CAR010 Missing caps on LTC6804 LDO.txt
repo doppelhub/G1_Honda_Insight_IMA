@@ -1,0 +1,1 @@
+Need to add 100nF lowpass caps to discrete transistors Q13/Q26/Q39 (from collector to GND_ISO_A/B/C.

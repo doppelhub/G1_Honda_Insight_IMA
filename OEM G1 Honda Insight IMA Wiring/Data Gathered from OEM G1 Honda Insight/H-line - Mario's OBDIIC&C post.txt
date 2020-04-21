@@ -1,0 +1,249 @@
+www.insightcentral.net/forums/modifications-technical-issues/30673-obdiic-c-bluetooth-android-app.html
+
+https://en.wikipedia.org/wiki/OBDuino
+
+...
+
+A normal K-line OBDII packet looks like this:
+
+Code:
+Sent to car:
+ 0    1    2    3    4    5
+0x68 0x6A 0xF1 0x01 0x05 0xC9
+
+Byte:
+0 - Constant
+1 - Constant
+2 - Request source address (addr of tester) (constant)
+3 - Mode (mode 1 is standard info request)
+4 - PID (0x05 is engine coolant temp)
+5 - Checksum (Add together all bytes in message)
+
+Response from car:
+ 0    1    2    3    4    5    6
+0x48 0x6B 0x10 0x41 0x05 0x64 0x6D
+
+Byte:
+0 - Constant
+1 - Constant
+2 - Response address?
+3 - Mode
+4 - PID
+5 - Returned data (0x64 = 100, 100 - 40 = 60C)
+6 - Checksum
+
+The car can return multiple bytes of data instead of just one, as well. Depends on the PID sent.
+
+When you first initialize communications with the car, this is the packet format the car will be expecting. To get extended data, it seems there is an additional initialization sequence that has to be sent. After that, the car expects packets in a different format:
+
+Code:
+Sent to car:
+ 0    1    2    3    4    5    6
+0x25 0x07 0x72 0x10 0x04 0x02 0x4C
+
+Byte:
+0 - Constant (same lower nibble as in response)
+1 - Number of bytes in the message (in this case, 7)
+2 - Constant
+3 - Mode/Address of unit to talk to
+4 - PID
+5 - Number of data bytes expected (2 in this case)
+6 - Checksum (Add all bytes, subtract that from 0xFF, add 1)
+
+Response from car:
+ 0    1    2    3    4    5    6    7
+0x05 0x08 0x72 0x10 0x04 0x32 0x70 0xCB
+
+Byte:
+0 - Constant (same lower nibble as in request)
+1 - Number of bytes in the message (in this case, 8)
+2 - Constant
+3 - Mode/Address of unit to talk to
+4 - PID
+5 - Data (but only sometimes?)
+6 - Data (Temp in this case, 112 decimal - 40 = 72C (162F)
+7 - Checksum
+Still a couple uncertainties in the returned data, but I'm figuring it out. Sometimes it seems like both data bytes are used, sometimes it seems like only one. 
+
+The protocol for the CAN-Low line for IMA-related data is very similar, but without a mode byte as there's only one module to talk to.
+
+Code:
+Sent to car:
+ 0    1    2    3    4    5
+0xE4 0x06 0x02 0x19 0x02 0xF9
+
+Bytes:
+0 - Constant (same lower nibble as in response)
+1 - Number of bytes in the message (6 in this case)
+2 - Constant
+3 - PID
+4 - Number of data bytes expected (2 in this case)
+5 - Checksum (Add all bytes, subtract them from 0xFF, add 1)
+
+Response from car:
+ 0    1    2    3    4    5
+0x04 0x06 0x02 0x8B 0x08 0x61
+
+Byte:
+0 - Constant (same lower nibble as in request)
+1 - Number of bytes in the message (in this case, 6)
+2 - Constant
+3 - Data (12V batt voltage in this case, 139 decimal = 13.9V)
+4 - Data?
+5 - Checksum
+Same deal with the second data byte in this one. I'll figure it out, though.
+
+...
+
+I don't have my OBDII notes with me so all you can get from me is what I've posted in my thread so far and what I can remember.
+
+In addition, Peter's respectfully asked that I do not release the extended PIDs for various reasons (free software (like Torque) could implement the PIDs making his device obsolete, which he makes money off, etc). If you want the PIDs, you will need to buy his device or mine when it eventually releases and reverse-engineer it like I am. However, I will be documenting the packet format, and getting the PIDs is easy after that if you have a logic analyzer.
+
+However, the TPS signal is available over regular OBDII comminucations (not extended), so I can definitely help you with that! 
+
+Here are a few links for reference:
+http://www.obdclearinghouse.com/inde...t_file&id=1343
+http://www.insightcentral.net/forums...tml#post437418
+http://www.insightcentral.net/forums...tml#post897321
+https://en.wikipedia.org/wiki/OBD-II_PIDs
+
+That PDF is especially useful, I recommend downloading it. I describe the communication parameters in my post I linked (asynchronous serial at 10400 bps, 8 bits, 1 stop bit, no parity bit, LSBit first, MSByte first).
+
+You need to do an initialization sequence with the car first. That's described in the PDF under "ISO 9141 with 5-baud initialization". The initialization sequence consists of:
+- Reader sends 0x33 at 5 bits per second
+- All communications are now at 10400 bps
+- Car sends 0x55, 0x08, 0x08
+- Reader sends 0xF7
+- Car sends 0xCC
+
+And now the car will listen to you. I also described the regular OBDII packet format in my post I linked. For simple data, send "0x68 0x6A 0xF1 0x01 0xYY 0xZZ" where 0xYY is the PID (described in the Wikipedia article) and 0xZZ is the checksum (all other bytes added together). The car returns "0x48 0x6B 0x10 0x41 0xYY 0xNN 0xZZ" where 0xYY is the PID, 0xZZ is the checksum, and 0xNN is the data (up to four bytes).
+
+The PID for throttle position is 0x11, so just send the car "0x68 0x6A 0xF1 0x01 0x11 D5" and you should get the data you want.
+
+That should be it! Look at Peter's post that I linked you, he gives the source code for an early OBDIIC&C version that reads standard OBDII parameters. It's pretty easy to understand.
+
+...
+
+After getting the cables, I've been reverse-engineering the OBDIIC&C (sorry, Peter!) to get all the extended ECU and IMA codes. I bought an OBDII extension cable and tapped into the relevant data lines to watch all the traffic.
+
+Code:
+OBDII port, male side, looking in end:
+  _______________________
+8 \   o o o o o o o o   / 1
+   \   -------------   /
+    \ o o o o o o o o /
+16   -----------------    9
+
+1 - 
+2 - 
+3 - 
+4 - 
+5 - GND
+6 - 
+7 - K-Line
+8 - 
+9 - H-Line
+10 - 
+11 - 
+12 - 
+13 - 
+14 - CAN-Low
+15 - 
+16 - 12V
+The naming scheme is taken from the Wikipedia page for OBDII: https://en.wikipedia.org/wiki/On-boa...nostics#OBD-II
+
+The K-Line is where normal and extended (engine-related) OBDII communication takes place. It's asynchronous serial at 10400 bps, 8 bits, 1 stop bit, no parity bit, LSBit first, MSByte first.
+
+The CAN-Low line has IMA-related communications. Asynchronous serial at 9600 bps, 8 bits, 1 stop bit, no parity bit, LSBit first, MSByte first.
+
+The "H-Line" is not actually named on Wikipedia, as it's manufacturer-specific. I called it that because I've seen Peter call it that before (at least, I'm pretty sure that's the line he's referring to). I've yet to see anything happen on this line, but my guess is that it's for CVT stuff. I'll experiment with it later.
+
+The communication for the extended data is different from a regular OBDII request. A normal OBDII packet looks like this:
+
+Code:
+Sent to car:
+ 0    1    2    3    4    5
+0x68 0x6A 0xF1 0x01 0x05 0xC9
+
+Byte:
+0 - Constant
+1 - Constant
+2 - Request source address (addr of tester) (constant)
+3 - Mode (mode 1 is standard info request)
+4 - PID (0x05 is engine coolant temp)
+5 - Checksum (Add together all bytes in message)
+
+Response from car:
+ 0    1    2    3    4    5    6
+0x48 0x6B 0x10 0x41 0x05 0x64 0x6D
+
+Byte:
+0 - Constant
+1 - Constant
+2 - Response address?
+3 - Mode
+4 - PID
+5 - Returned data (0x64 = 100, 100 - 40 = 60C)
+6 - Checksum
+The car can return multiple bytes of data instead of just one, as well. Depends on the PID sent.
+
+When you first initialize communications with the car, this is the packet format the car will be expecting. To get extended data, it seems there is an additional initialization sequence that has to be sent. After that, the car expects packets in a different format:
+
+Code:
+Sent to car:
+ 0    1    2    3    4    5    6
+0x25 0x07 0x72 0x10 0x04 0x02 0x4C
+
+Byte:
+0 - Constant (same lower nibble as in response)
+1 - Number of bytes in the message (in this case, 7)
+2 - Constant
+3 - Mode/Address of unit to talk to
+4 - PID
+5 - Number of data bytes expected (2 in this case)
+6 - Checksum (Add all bytes, subtract that from 0xFF, add 1)
+
+Response from car:
+ 0    1    2    3    4    5    6    7
+0x05 0x08 0x72 0x10 0x04 0x32 0x70 0xCB
+
+Byte:
+0 - Constant (same lower nibble as in request)
+1 - Number of bytes in the message (in this case, 8)
+2 - Constant
+3 - Mode/Address of unit to talk to
+4 - PID
+5 - Data (but only sometimes?)
+6 - Data (Temp in this case, 112 decimal - 40 = 72C (162F)
+7 - Checksum
+Still a couple uncertainties in the returned data, but I'm figuring it out. Sometimes it seems like both data bytes are used, sometimes it seems like only one. 
+
+The protocol for the CAN-Low line for IMA-related data is very similar, but without a mode byte as there's only one module to talk to.
+
+Code:
+Sent to car:
+ 0    1    2    3    4    5
+0xE4 0x06 0x02 0x19 0x02 0xF9
+
+Bytes:
+0 - Constant (same lower nibble as in response)
+1 - Number of bytes in the message (6 in this case)
+2 - Constant
+3 - PID
+4 - Number of data bytes expected (2 in this case)
+5 - Checksum (Add all bytes, subtract them from 0xFF, add 1)
+
+Response from car:
+ 0    1    2    3    4    5
+0x04 0x06 0x02 0x8B 0x08 0x61
+
+Byte:
+0 - Constant (same lower nibble as in request)
+1 - Number of bytes in the message (in this case, 6)
+2 - Constant
+3 - Data (12V batt voltage in this case, 139 decimal = 13.9V)
+4 - Data?
+5 - Checksum
+Same deal with the second data byte in this one. I'll figure it out, though.
+
+I've gotten about half of all the PIDs that the OBDIIC&C supports and can successfully communicate with and get data from the car. I just used the same Arduino and wrote some code to bit-bang the K-Line

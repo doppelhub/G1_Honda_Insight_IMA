@@ -1,0 +1,24 @@
+UC3C uC's ADC cannot measure negative voltages.  Bummer.  Thus, battery current sensor won't work.  
+RevB needs an external ADC that communicates via USART.  
+Thankfully we have one left, but accessing its pins requires interrupt pin juggling (or removal), which requires potentially extensive layout changes.
+Adding the external ADC is probably already going to be extensive, so not the end of the world.  Fucksalt!
+
+Also, RevA
+RevA doesn't have enough resolution to determine if the grid charger is connected.  
+The fixed 82 Ohm resistor only yields 78 mA Ibatt resolution (not accuracy) with MAINuC's 12 bit ADC.
+Thus, we need to add a 3.3k resistor in parallel with 82 Ohms, and also add an open drain mosfet to selectively connect the 82 Ohm resistor when the car is on.  
+When only the 3.3kOhm resistor is connected, sensitivity increases from 20.5mV/A to 825mV/A.  Thus, Ibatt resolution (not accuracy) with MAINuC's 12 bit ADC improves to 1.95 mA.
+This allows us to measure grid charger current much more accurately.  We need to add a static DO to selectively enable the 82 Ohm resistor.  
+
+Another option is using an ADC that can handle plinus 10V, in which case we can increase Rsense, and then maybe an external delta sigma won't require two different Rsense values.
+
+We also need to add protection circuitry to prevent damanging uC input, if the ADC can't handle up to plinus 15 V.  We already have a -15 V rail, so can piggyback on it.  
+
+The Ibatt sensor can drive the measured pin to plinus 12V; MAINuC must be limited to 0:5V.
+
+Fucking cockfart!
+
+...
+
+Use the ($7)    AD7321  ADC instead.  14 bits, true bipolar inputs with plinus 12V supplies.  Allows inputs up to rail inputs (?).
+Use the ($25!!) LTC2326 ADC instead.  16 bits, true bipolar inputs with single ended supply.  Allows inputs up to plinus 16.5 V.  

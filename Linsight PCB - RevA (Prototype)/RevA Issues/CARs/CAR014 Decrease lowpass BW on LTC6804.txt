@@ -1,0 +1,3 @@
+The LTC6804's delta sigma ADC samples at 3.0 MHz(min), so any frequencies above 1.5 MHz will alias.  The first order filter I'm using (82 Ohm + 10 nF) has a 200 kHz -3 dB point, which is -23 dB @ 2 Mhz. 23 dB isn't nearly enough attenuation at Nyquist.  LTC6804@P58: "Adding more than about 100Ω to the ADC inputs begins to introduce a systematic error in the measurement."  Thus, I'll need to increase capacitance. 
+To increase attenuation at Nyquist to -43 dB, I'll need to increase C to ~130 nF.
+

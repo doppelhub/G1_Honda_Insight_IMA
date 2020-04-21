@@ -1,0 +1,16 @@
+TDX/RDX idles high.  
+Low start bit
+8 bits in between (doesn't seem like there's a parity bit)
+high stop bit
+
+data stream in one OBDIIC&C request (and possible response)
+
+SxxxxxxxxC
+1111111111 (idling high)
+0001001111
+0011000001
+0010000001
+0110100001
+0010000001
+0111000001
+1111111111 (idling high)

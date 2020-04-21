@@ -1,0 +1,7 @@
+Two reference designators under inductor L1
+U11 & U12 missing pin 1 markers
+IC1 missing pin 1 marker
+Clarify X2 direction (crystal has a dot, but it's not pin 1)
+Part D5 doesn't have a pin 1 marker.  Add text to clarify correct orientation
+U15 missing pin 1 marker (left side of text)
+U10 missing pin 1 marker (left side of text)

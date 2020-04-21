@@ -1,0 +1,87 @@
+Edit: Not actually a bug.  See last lines.
+
+...
+
+MOTFSn requires BLACuC to generate a 24 Hz clock on timer 1.  
+
+Incorrect:
+MOTFSB is connected to BLACuC pin 7 (PC3), which can be either:
+-'T1' (timer 1 clk input)
+-'ICP1B' (another counter input)
+
+Correct:
+MOTFSB needs to connect to a counter output that can divide some fast clock down to 24 Hz.  
+The 64M1 can prescale its counter clocks up to sysCLK/1024.
+If the clock is 16 MHz (what I want), then then prescaled output clock is:
+16E6/1024= 15,625 Hz.
+
+As originally anticipated, Linsight would output on counter1 (16 bits).  Possible counter1 outputs are:
+OC1A (PD2, pin1), which is used by Hall3 (PSCIN2)
+OC1B (PC1, pin3), which is used by Hall2 (PSCIN1)
+Notably absent: pin7 (see 'incorrect', above)
+
+Thus, we cannot use counter1.  
+
+...
+
+Since counter0 is only 8 bits, the prescaled 15,625 Hz clk can only divide down to 30.5 Hz (15,625/256/2), if BLACuC is clocked at 16 MHz.
+If BLACuC is clocked at 8MHz (possibly the maximum output frequency MAINuC can output with a 16 MHz input), then:
+-the prescaled output frequency halves to 7812.5 Hz
+-counter0 can divide by 162 to create a 48.225 Hz clock
+-the final output clock frequency is 24.11 Hz, which works fine
+
+Possible counter0 outputs are:
+OC0A (PD3, pin2), which is used as UART_BLAC-TX_uC-RX
+OC0B (PE1, pin10), which is used as external clock input ('XTAL1')
+
+Thus, we cannot use counter0.
+
+...
+
+Thus, we cannot generate any clocks on BLACuC.
+Thus, we must generate 24 Hz clock on MAINuC.
+
+MAINuC's 16 bit counters can only divide a 16 MHz clock downto 244 Hz.
+Thus MAINuC can only output MOTFSB at a minimum of 122 Hz (1 edge toggle per counter reset). 
+
+Unknown if clocking faster than 24 Hz is allowed.
+
+Can we prescale MAINuC's counter clock without affecting other components?
+Page 831: "Each channel can independently select an internal or external clock"
+5 possible clocks are TIMER_CLOCK1:5 (see Module Configuration Chapter).
+Notably (page 868), TIMER_CLOCK5 predivides PBC by 128.  
+Thus, even when PBC is operating at 16 MHz, TIMER_CLOCK5 is only 125 kHz.
+Thus, we can use a counter on MAINuC to output 24 Hz MOTFSB (instead on BLACuC). 
+
+...
+
+We cannot generate 24 Hz on the spare PWM on MAINuC:
+PB20-TC0-B0	-	-	SPARE_PWM	MAIN:PWMout	43	TC0-B0	PB20
+
+...because it shares the 16 bit counter register with TC0-A0 (ACTTRQ).
+PWM counter outputs work by resetting the counter register at each output toggle.
+Thus, we cannot reset the 16 bit counter register to generate both actual torque and I 24 Hz clock.
+
+If two PWM outputs are generated from the same 16 bit counter register:
+-they must have the same frequency
+-they have independent duty cycle 
+
+...
+
+We likely won't use MOTSTB, which currently uses PWMH[1].
+
+We could move MOTSTB to spare PWM and then use PWMH[1] to generate 24 Hz clock.  
+Each PWM channel has an independent clock prescaler, so no other PWM channels affected.
+PWM channels can be divided by up to 1024, so we can generate 24 Hz.  
+
+
+Conclusion:
+Move MOTSTB (likely unused) from PWMH[1] to SPARE_PWM on RevB.
+Move MOTFSB (24 Hz clock) from BLACuC[cntr1] to PWMH[1] on RevB.
+
+...
+
+Edit: Not actually a bug.  BLACuC needs to service the counter interrupt in software.
+Otherwise, if BLACuC freezes, the PWM will still generate the clock.
+BLACuC should get an internal interrupt each time the internal counter1 overflows.
+BLACuC should toggle MOTFSB in the interrupt, then return.
