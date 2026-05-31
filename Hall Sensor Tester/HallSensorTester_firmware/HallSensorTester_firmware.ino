@@ -67,19 +67,19 @@ void printHallState_binary(uint8_t state)
 void setup()  
 {
 	Serial.begin(115200); //USB
-	Serial.print(F("\n\nHall Sensor Tester v" FW_VERSION ", " BUILD_DATE "\nType '$HELP' for more info\n"));
+	Serial.print(F("\n\nHall Sensor Tester v" FW_VERSION ", " BUILD_DATE "\nKEY MUST BE OFF FOR SAFETY!"));
 
 	Serial.print(F("\n\nInitial Hall State :"));
 	printHallState_binary(getHallState());
+	Serial.print(F("\n\nRotate crankshaft by hand and observe Hall transitions"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void loop()
 {
-	static uint8_t previousState = 0b000;
-
 	uint8_t stateNow = getHallState();
+	static uint8_t previousState = stateNow;
 
 	if (stateNow != previousState)
 	{
