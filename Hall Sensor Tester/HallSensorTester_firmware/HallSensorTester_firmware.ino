@@ -48,11 +48,11 @@ bool isStateTransitionValid (uint8_t stateNow, uint8_t previousState)
 	uint8_t indexPrevious = getHallIndex(previousState);
 	uint8_t indexNow      = getHallIndex(stateNow);
 
-	if (((indexPrevious - indexNow) == 1) ||
-		((indexNow - indexPrevious) == 1) ||
-		((indexPrevious - indexNow) == 5) || //wrap around
-		((indexNow - indexPrevious) == 5)  ) { return YES; }
-	else                                     { return  NO; }
+	if (((indexPrevious - indexNow) == 1)         ||
+		((indexNow - indexPrevious) == 1)         ||
+		((indexPrevious == 0) && (indexNow == 5)) || //wrap around
+		((indexPrevious == 5) && (indexNow == 0))  ) { return YES; }
+	else                                             { return  NO; }
 }
 
 void printHallState_binary(uint8_t state)
@@ -71,7 +71,7 @@ void setup()
 
 	Serial.print(F("\n\nInitial Hall State :"));
 	printHallState_binary(getHallState());
-	Serial.print(F("\n\nRotate crankshaft by hand and observe Hall transitions"));
+	Serial.print(F("\n\nRotate crankshaft by hand to measure Hall transitions"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -83,10 +83,10 @@ void loop()
 
 	if (stateNow != previousState)
 	{
-		Serial.print(F("\nHall state: "));
+		Serial.print(F("\n0b"));
 		printHallState_binary(stateNow);
 
-		if (isStateTransitionValid(stateNow, previousState)) { Serial.print(F(" Valid"   )); }
+		if (isStateTransitionValid(stateNow, previousState)) { Serial.print(F(" OK"   )); }
 		else                                                 { Serial.print(F(" Invalid!")); }
 
 		previousState = stateNow;
