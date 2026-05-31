@@ -77,11 +77,11 @@ void setup()
 
     Serial.print(F("\n"
     	"\nRotate crankshaft by hand at least one complete mechanical revolution"
-    	"\nyou should see QTY48 Hall transitions per mechanical revolution"
-    	"\n'1r' should print every QTY6 state changes (one electrical revolution)"
-    	"\n'1r' should print QTY8 times per mechanical revolution"
+    	"\nif the motor continuously rotates in one direction:"
+    	"\n  -you should see QTY48 Hall transitions per mechanical revolution"
+    	"\n  -'1r' should print every QTY6 state changes (one electrical revolution)"
+    	"\n  -'1r' should print QTY8 times per mechanical revolution"
         ));
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
